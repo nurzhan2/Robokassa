@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Оплата</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
+<style>
+  :root{
+    --ink:#3a3550;
+    --muted:#7d7794;
+    --glass:rgba(255,255,255,.55);
+    --glass-strong:rgba(255,255,255,.72);
+    --glass-line:rgba(255,255,255,.7);
+    --accent:#8a7cff;
+    --accent-ink:#6a5cf0;
+    --ok:#5fc9a0;
+    --radius:24px;
+    --maxw:600px;
+    --blob-yellow:#ffe27a;
+    --blob-blue:#7cc4ff;
+    --blob-violet:#c79bff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink);line-height:1.5;min-height:100vh;
+    display:flex;flex-direction:column;align-items:center;
+    padding:26px 20px 44px;position:relative;overflow-x:hidden;
+    /* ↓ ЧТОБЫ ВСТАВИТЬ ФОТО-ФОН из ChatGPT: раскомментируйте и укажите файл */
+    /* background:url('bg.jpg') center/cover fixed no-repeat; */
+    background:linear-gradient(160deg,#f4f1fb 0%,#eef4fc 45%,#fbf1f7 100%);
+  }
+  .blobs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;filter:blur(55px) saturate(120%)}
+  /* Широкие плоские волны-света (как полосы на воде) */
+  .blob{position:absolute;left:-25%;width:150%;border-radius:50%;opacity:.95;will-change:transform}
+  .b1{height:60vh;background:var(--blob-yellow);top:-22vh}
+  .b2{height:70vh;background:var(--blob-blue);bottom:-26vh}
+  .b3{height:55vh;background:var(--blob-violet);top:32%}
+  .fluted{position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:repeating-linear-gradient(90deg,
+      rgba(255,255,255,.22) 0px,
+      rgba(255,255,255,.05) 5px,
+      rgba(120,120,160,.10) 11px,
+      rgba(255,255,255,.05) 17px,
+      rgba(255,255,255,.22) 22px);
+    backdrop-filter:blur(9px) saturate(140%);-webkit-backdrop-filter:blur(9px) saturate(140%);
+    box-shadow:inset 0 0 120px rgba(255,255,255,.25);}
+  .wrap{width:100%;max-width:var(--maxw);position:relative;z-index:2}
+  .glass{background:var(--glass);border:1px solid var(--glass-line);
+    backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);
+    box-shadow:0 8px 32px -12px rgba(58,53,80,.22),inset 0 1px 0 rgba(255,255,255,.6);}
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  header{display:flex;align-items:center;justify-content:space-between;padding:8px 4px 26px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.02em}
+  .brand .dot{width:32px;height:32px;border-radius:11px;
+    background:linear-gradient(135deg,var(--accent),var(--blob-blue));
+    display:grid;place-items:center;color:#fff;font-size:15px;
+    box-shadow:0 4px 14px -4px rgba(138,124,255,.7);}
+  .safe{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);font-weight:600}
+  .safe svg{width:15px;height:15px}
+  .hero{border-radius:var(--radius);padding:36px 30px 30px}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent-ink);background:rgba(255,255,255,.55);border:1px solid var(--glass-line);
+    padding:7px 13px;border-radius:999px;margin-bottom:20px}
+  h1{font-family:"Fraunces",Georgia,serif;font-weight:600;
+    font-size:clamp(29px,7.5vw,42px);letter-spacing:-.01em;line-height:1.07;margin-bottom:12px}
+  .lede{color:var(--muted);font-size:16px;max-width:44ch;margin-bottom:26px}
+  .order{border:1px solid var(--glass-line);border-radius:16px;
+    padding:20px;margin-bottom:22px;background:var(--glass-strong)}
+  .order-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+  .order-name{font-weight:700;font-size:15px}
+  .order-sub{color:var(--muted);font-size:13px;margin-top:3px}
+  .price{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:36px;letter-spacing:-.01em;white-space:nowrap}
+  .price small{font-size:20px;color:var(--muted);font-weight:500}
+  .pay{position:relative;overflow:hidden;width:100%;border:none;cursor:pointer;font-family:inherit;
+    font-size:17px;font-weight:700;color:#fff;
+    background:linear-gradient(135deg,var(--accent),var(--accent-ink));
+    padding:18px 20px;border-radius:15px;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    transition:transform .12s ease,box-shadow .18s ease;
+    box-shadow:0 12px 26px -10px rgba(138,124,255,.75)}
+  .pay:hover{transform:translateY(-1px);box-shadow:0 16px 30px -10px rgba(138,124,255,.85)}
+  .pay:active{transform:translateY(0)}
+  .pay:focus-visible{outline:3px solid #c9c2ff;outline-offset:2px}
+  .pay svg{width:19px;height:19px;position:relative;z-index:2}
+  .pay span{position:relative;z-index:2}
+  .ripple{position:absolute;border-radius:50%;transform:translate(-50%,-50%) scale(0);
+    background:rgba(255,255,255,.5);pointer-events:none;animation:rip .6s ease-out}
+  @keyframes rip{to{transform:translate(-50%,-50%) scale(24);opacity:0}}
+  .trust{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:18px;font-size:13px;color:var(--muted);font-weight:500}
+  .trust span{display:flex;align-items:center;gap:6px}
+  .trust svg{width:14px;height:14px;color:var(--ok)}
+  .features{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
+  .feat{border-radius:16px;padding:18px 16px}
+  .feat .ic{width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.6);
+    display:grid;place-items:center;margin-bottom:11px;color:var(--accent-ink)}
+  .feat .ic svg{width:18px;height:18px}
+  .feat h3{font-size:14px;font-weight:700;margin-bottom:4px}
+  .feat p{font-size:13px;color:var(--muted);line-height:1.45}
+  .methods{margin-top:22px;padding:18px 20px;border-radius:16px;
+    display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  .methods p{font-size:13px;color:var(--muted);font-weight:600}
+  .badges{display:flex;gap:8px;flex-wrap:wrap}
+  .badge{font-size:11px;font-weight:700;color:#5a5470;letter-spacing:.02em;
+    border:1px solid var(--glass-line);border-radius:8px;padding:6px 9px;background:rgba(255,255,255,.5)}
+  footer{margin-top:30px;text-align:center;color:var(--muted);font-size:12px;line-height:1.6}
+  footer a{color:var(--accent-ink);text-decoration:none;font-weight:700}
+  @media (max-width:480px){.hero{padding:28px 20px 24px}.features{grid-template-columns:1fr}.order{padding:16px}}
+  @media (prefers-reduced-motion:reduce){.pay,.reveal{transition:none}.blob{animation:none!important}.ripple{display:none}}
+</style>
+</head>
+<body>
+  <div class="blobs" aria-hidden="true">
+    <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  </div>
+  <div class="fluted" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <header class="reveal">
+      <div class="brand"><span class="dot">&#9889;</span> YourBrand</div>
+      <div class="safe">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Защищённая оплата
+      </div>
+    </header>
+
+    <main class="hero glass reveal">
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>
+        Быстрая оплата онлайн
+      </span>
+      <h1 id="title">Оформление заказа</h1>
+      <p class="lede" id="subtitle">Оплатите заказ картой, СБП или электронным кошельком. Оплата проходит на защищённой странице Робокассы — данные карты вы вводите не здесь.</p>
+
+      <div class="order">
+        <div class="order-row">
+          <div>
+            <div class="order-name" id="itemName">Заказ</div>
+            <div class="order-sub" id="itemSub">Оплата в один шаг</div>
+          </div>
+          <div class="price"><span id="amountView">350</span> <small>&#8381;</small></div>
+        </div>
+      </div>
+
+      <button class="pay" onclick="pay(event)" id="payBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>
+        <span>Перейти к оплате</span>
+      </button>
+
+      <div class="trust">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Без комиссии</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Мгновенное зачисление</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Чек на почту</span>
+      </div>
+    </main>
+
+    <section class="features">
+      <div class="feat glass reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8 8 11 4.5-3 8-6 8-11V5z"/></svg></div>
+        <h3>Безопасно</h3><p>Платёж идёт через Робокассу. Реквизиты карты не хранятся на сайте.</p>
+      </div>
+      <div class="feat glass reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <h3>Быстро</h3><p>Оплата занимает меньше минуты — картой или по СБП.</p>
+      </div>
+      <div class="feat glass reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H5.2L4 18.4z"/></svg></div>
+        <h3>Чек и подтверждение</h3><p>После оплаты придёт электронный чек и подтверждение заказа.</p>
+      </div>
+      <div class="feat glass reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <h3>Поддержка</h3><p>Вопросы по оплате — напишите нам, поможем.</p>
+      </div>
+    </section>
+
+    <div class="methods glass reveal">
+      <p>Принимаем к оплате</p>
+      <div class="badges">
+        <span class="badge">Visa</span><span class="badge">Mastercard</span>
+        <span class="badge">МИР</span><span class="badge">СБП</span>
+      </div>
+    </div>
+
+    <footer class="reveal">
+      Нажимая «Перейти к оплате», вы соглашаетесь с условиями оферты.<br>
+      Приём платежей через сервис <a href="https://robokassa.com" target="_blank" rel="noopener">Робокасса</a>.
+    </footer>
+  </div>
+
+<script>
+  const CONFIG = {
+    merchantLogin: "ВАШ_ЛОГИН_МАГАЗИНА",
+    password1:     "ВАШ_ПАРОЛЬ_1",
+    outSum:        "350.00",
+    description:   "Оплата заказа",
+    isTest:        1,
+    title:    "Оформление заказа",
+    subtitle: "Оплатите заказ картой, СБП или электронным кошельком. Оплата проходит на защищённой странице Робокассы — данные карты вы вводите не здесь.",
+    itemName: "Заказ",
+    itemSub:  "Оплата в один шаг"
+  };
+
+  document.getElementById("amountView").textContent = String(CONFIG.outSum).replace(/\.00$/,"");
+  document.getElementById("title").textContent    = CONFIG.title;
+  document.getElementById("subtitle").textContent = CONFIG.subtitle;
+  document.getElementById("itemName").textContent = CONFIG.itemName;
+  document.getElementById("itemSub").textContent  = CONFIG.itemSub;
+  document.title = CONFIG.title;
+
+  function pay(e){
+    const btn=document.getElementById("payBtn");
+    const r=document.createElement("span");
+    r.className="ripple";
+    const rect=btn.getBoundingClientRect();
+    r.style.left=(e.clientX-rect.left)+"px";
+    r.style.top=(e.clientY-rect.top)+"px";
+    r.style.width=r.style.height="20px";
+    btn.appendChild(r); setTimeout(function(){r.remove();},600);
+
+    if(CONFIG.merchantLogin.indexOf("ВАШ_")===0){
+      alert("Заполните merchantLogin и password1 в блоке CONFIG внутри index.html");
+      return;
+    }
+    var invId=0;
+    var signature=md5(CONFIG.merchantLogin+":"+CONFIG.outSum+":"+invId+":"+CONFIG.password1);
+    var params=new URLSearchParams({
+      MerchantLogin:CONFIG.merchantLogin, OutSum:CONFIG.outSum, InvId:invId,
+      Description:CONFIG.description, SignatureValue:signature, IsTest:CONFIG.isTest
+    });
+    setTimeout(function(){ window.location.href="https://auth.robokassa.ru/Merchant/Index.aspx?"+params.toString(); },180);
+  }
+
+  window.addEventListener("load",function(){
+    document.querySelectorAll(".reveal").forEach(function(el,i){
+      setTimeout(function(){el.classList.add("in");}, 90*i);
+    });
+  });
+
+  var blobs=[].slice.call(document.querySelectorAll(".blob"));
+  var depth=[34,-40,24], tx=0,ty=0,cx=0,cy=0;
+  window.addEventListener("mousemove",function(e){
+    tx=(e.clientX/window.innerWidth-.5);
+    ty=(e.clientY/window.innerHeight-.5);
+  });
+  (function loop(){
+    cx+=(tx-cx)*.05; cy+=(ty-cy)*.05;
+    blobs.forEach(function(b,i){ b.style.transform="translate("+(cx*depth[i])+"px,"+(cy*depth[i])+"px)"; });
+    requestAnimationFrame(loop);
+  })();
+</script>
+</body>
+</html>
