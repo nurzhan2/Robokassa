@@ -31,25 +31,9 @@
     color:var(--ink);line-height:1.5;min-height:100vh;
     display:flex;flex-direction:column;align-items:center;
     padding:26px 20px 44px;position:relative;overflow-x:hidden;
-    /* ↓ ЧТОБЫ ВСТАВИТЬ ФОТО-ФОН из ChatGPT: раскомментируйте и укажите файл */
-    /* background:url('bg.jpg') center/cover fixed no-repeat; */
-    background:linear-gradient(160deg,#f4f1fb 0%,#eef4fc 45%,#fbf1f7 100%);
+    background:url('bg.png') center top/cover fixed no-repeat;
+    background-color:#eef1fb; /* запасной цвет, пока грузится фото */
   }
-  .blobs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;filter:blur(55px) saturate(120%)}
-  /* Широкие плоские волны-света (как полосы на воде) */
-  .blob{position:absolute;left:-25%;width:150%;border-radius:50%;opacity:.95;will-change:transform}
-  .b1{height:60vh;background:var(--blob-yellow);top:-22vh}
-  .b2{height:70vh;background:var(--blob-blue);bottom:-26vh}
-  .b3{height:55vh;background:var(--blob-violet);top:32%}
-  .fluted{position:fixed;inset:0;z-index:1;pointer-events:none;
-    background:repeating-linear-gradient(90deg,
-      rgba(255,255,255,.22) 0px,
-      rgba(255,255,255,.05) 5px,
-      rgba(120,120,160,.10) 11px,
-      rgba(255,255,255,.05) 17px,
-      rgba(255,255,255,.22) 22px);
-    backdrop-filter:blur(9px) saturate(140%);-webkit-backdrop-filter:blur(9px) saturate(140%);
-    box-shadow:inset 0 0 120px rgba(255,255,255,.25);}
   .wrap{width:100%;max-width:var(--maxw);position:relative;z-index:2}
   .glass{background:var(--glass);border:1px solid var(--glass-line);
     backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);
@@ -117,11 +101,6 @@
 </style>
 </head>
 <body>
-  <div class="blobs" aria-hidden="true">
-    <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
-  </div>
-  <div class="fluted" aria-hidden="true"></div>
-
   <div class="wrap">
     <header class="reveal">
       <div class="brand"><span class="dot">&#9889;</span> YourBrand</div>
@@ -242,18 +221,6 @@
       setTimeout(function(){el.classList.add("in");}, 90*i);
     });
   });
-
-  var blobs=[].slice.call(document.querySelectorAll(".blob"));
-  var depth=[34,-40,24], tx=0,ty=0,cx=0,cy=0;
-  window.addEventListener("mousemove",function(e){
-    tx=(e.clientX/window.innerWidth-.5);
-    ty=(e.clientY/window.innerHeight-.5);
-  });
-  (function loop(){
-    cx+=(tx-cx)*.05; cy+=(ty-cy)*.05;
-    blobs.forEach(function(b,i){ b.style.transform="translate("+(cx*depth[i])+"px,"+(cy*depth[i])+"px)"; });
-    requestAnimationFrame(loop);
-  })();
 </script>
 </body>
 </html>
