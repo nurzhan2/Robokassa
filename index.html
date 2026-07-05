@@ -3,211 +3,331 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Оплата</title>
+<title>Обучение и цифровые продукты</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
 <style>
   :root{
-    --ink:#2f2c37;
-    --muted:#8b8894;
-    --faint:#b6b3bd;
-    --line:#ecebf0;
-    --card:#ffffff;
-    --accent:#8b84cc;
-    --accent-ink:#726ac0;
-    --radius:22px;
-    --maxw:460px;
+    --ink:#2f2c37;--muted:#8b8894;--faint:#b6b3bd;--line:#ecebf0;
+    --card:#ffffff;--accent:#8b84cc;--accent-ink:#726ac0;
+    --soft:#f6f4fb;--radius:20px;--maxw:720px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html{-webkit-text-size-adjust:100%}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
   body{
     font-family:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    color:var(--ink);line-height:1.55;min-height:100vh;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    padding:40px 22px;
-    background:linear-gradient(165deg,#f3f0f6 0%,#eef1f5 52%,#f6f0f3 100%);
-    background-attachment:fixed;
+    color:var(--ink);line-height:1.6;position:relative;overflow-x:hidden;
+    background:linear-gradient(170deg,#f3f0f6 0%,#eef1f5 55%,#f6f0f3 100%);
+    background-attachment:fixed;padding:34px 22px 50px;
   }
-  .wrap{width:100%;max-width:var(--maxw)}
 
-  header{
-    display:flex;align-items:center;justify-content:space-between;
-    margin-bottom:22px;padding:0 4px;
-  }
-  .brand{display:flex;align-items:center;gap:9px;font-weight:600;font-size:15px;letter-spacing:-.01em}
-  .brand .dot{
-    width:26px;height:26px;border-radius:8px;background:var(--accent);
-    display:grid;place-items:center;color:#fff;font-size:13px;
-  }
+  /* Дрейфующие пастельные пятна на фоне */
+  .amb{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none;filter:blur(90px)}
+  .amb i{position:absolute;border-radius:50%;opacity:.30;will-change:transform}
+  .amb .a1{width:44vw;height:44vw;background:#c7b8ff;top:-10vw;left:-8vw;animation:drift1 22s ease-in-out infinite}
+  .amb .a2{width:40vw;height:40vw;background:#ffe1a8;bottom:-12vw;right:-6vw;animation:drift2 26s ease-in-out infinite}
+  .amb .a3{width:36vw;height:36vw;background:#a8d4ff;top:40%;left:55%;animation:drift3 30s ease-in-out infinite}
+  @keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(6vw,4vw)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-5vw,-5vw)}}
+  @keyframes drift3{0%,100%{transform:translate(0,0)}50%{transform:translate(-4vw,3vw)}}
+
+  /* Свечение за курсором */
+  .glow{position:fixed;z-index:-1;width:420px;height:420px;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle,rgba(139,132,204,.18),transparent 65%);
+    transform:translate(-50%,-50%);left:50%;top:30%;transition:opacity .4s;opacity:0}
+
+  /* Прогресс-бар скролла */
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:50;
+    background:linear-gradient(90deg,#b9a8ff,#8b84cc);border-radius:0 3px 3px 0;transition:width .1s linear}
+
+  .wrap{width:100%;max-width:var(--maxw);margin:0 auto;position:relative;z-index:1}
+  a{color:var(--accent-ink);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:34px;padding:0 2px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;font-size:15px}
+  .brand .dot{width:26px;height:26px;border-radius:8px;background:var(--accent);display:grid;place-items:center;color:#fff;font-size:13px;
+    box-shadow:0 4px 12px -3px rgba(139,132,204,.6);animation:pulse 3s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 4px 12px -3px rgba(139,132,204,.6)}50%{box-shadow:0 4px 20px -2px rgba(139,132,204,.9)}}
   .safe{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);font-weight:500}
   .safe svg{width:13px;height:13px}
 
-  .card{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:38px 34px 32px;
-    box-shadow:0 1px 1px rgba(47,44,55,.03),0 26px 50px -30px rgba(47,44,55,.22);
-  }
-  .label{
-    font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--accent-ink);margin-bottom:16px;
-  }
-  h1{
-    font-family:"Fraunces",Georgia,serif;font-weight:500;
-    font-size:clamp(28px,7vw,34px);letter-spacing:-.005em;line-height:1.12;margin-bottom:12px;
-  }
-  .lede{color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:30px}
+  .hero{text-align:center;margin-bottom:38px;padding:0 6px}
+  .hero .label{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:14px}
+  h1{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:clamp(30px,7vw,44px);line-height:1.08;letter-spacing:-.01em;margin-bottom:14px;
+    background:linear-gradient(100deg,#2f2c37 30%,#8b84cc 50%,#2f2c37 70%);background-size:200% auto;
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 6s linear infinite}
+  @keyframes shine{to{background-position:200% center}}
+  .hero p{color:var(--muted);font-size:16px;max-width:52ch;margin:0 auto}
 
-  .order{
-    display:flex;align-items:baseline;justify-content:space-between;gap:16px;
-    padding:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
-    margin-bottom:28px;
+  section{margin-bottom:34px}
+  .sec-title{font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;padding-left:2px}
+
+  .products{display:grid;gap:14px}
+  .product{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+    box-shadow:0 1px 1px rgba(47,44,55,.03),0 20px 40px -30px rgba(47,44,55,.2);
+    transform-style:preserve-3d;transition:box-shadow .3s ease,transform .12s ease;position:relative;overflow:hidden;
   }
-  .order-name{font-weight:600;font-size:15px}
-  .order-sub{color:var(--faint);font-size:13px;margin-top:2px}
-  .price{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:32px;white-space:nowrap}
-  .price small{font-size:18px;color:var(--muted);font-weight:400}
+  .product::after{content:"";position:absolute;inset:0;border-radius:var(--radius);pointer-events:none;
+    background:radial-gradient(600px circle at var(--mx,50%) var(--my,50%),rgba(139,132,204,.08),transparent 40%);
+    opacity:0;transition:opacity .3s}
+  .product:hover::after{opacity:1}
+  .product:hover{box-shadow:0 1px 1px rgba(47,44,55,.03),0 30px 55px -28px rgba(47,44,55,.32)}
+  .product .info{flex:1;min-width:200px;transform:translateZ(20px)}
+  .product h3{font-size:18px;font-weight:600;margin-bottom:4px;letter-spacing:-.01em}
+  .product .d{color:var(--muted);font-size:14px}
+  .product .buy{display:flex;align-items:center;gap:16px;flex-wrap:wrap;transform:translateZ(30px)}
+  .product .price{font-family:"Fraunces",Georgia,serif;font-size:26px;font-weight:500;white-space:nowrap}
+  .product .price .from{font-family:"Manrope";font-size:13px;color:var(--faint);font-weight:500;display:block;text-align:right;letter-spacing:.04em}
 
   .pay{
-    width:100%;border:none;cursor:pointer;font-family:inherit;
-    font-size:16px;font-weight:600;color:#fff;background:var(--accent);
-    padding:16px 20px;border-radius:14px;
-    display:flex;align-items:center;justify-content:center;gap:9px;
-    transition:background .16s ease,transform .12s ease;
-  }
-  .pay:hover{background:var(--accent-ink);transform:translateY(-1px)}
+    border:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:600;color:#fff;
+    background:var(--accent);padding:12px 22px;border-radius:12px;white-space:nowrap;position:relative;overflow:hidden;
+    transition:background .16s ease,transform .12s ease,box-shadow .2s ease;box-shadow:0 6px 16px -6px rgba(139,132,204,.7)}
+  .pay::before{content:"";position:absolute;top:0;left:-120%;width:70%;height:100%;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-18deg)}
+  .pay:hover::before{animation:sweep .8s ease}
+  @keyframes sweep{to{left:130%}}
+  .pay:hover{background:var(--accent-ink);transform:translateY(-2px);box-shadow:0 12px 22px -8px rgba(139,132,204,.85)}
   .pay:active{transform:translateY(0)}
   .pay:focus-visible{outline:3px solid #cfcbee;outline-offset:2px}
-  .pay svg{width:18px;height:18px}
+  .pay.loading{pointer-events:none;color:transparent}
+  .pay.loading::after{content:"";position:absolute;top:50%;left:50%;width:16px;height:16px;margin:-8px 0 0 -8px;
+    border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .ripple{position:absolute;border-radius:50%;transform:translate(-50%,-50%) scale(0);
+    background:rgba(255,255,255,.5);pointer-events:none;animation:rip .6s ease-out}
+  @keyframes rip{to{transform:translate(-50%,-50%) scale(20);opacity:0}}
 
-  .trust{
-    display:flex;align-items:center;justify-content:center;gap:6px;
-    margin-top:16px;font-size:12.5px;color:var(--faint);font-weight:500;
-  }
-  .trust svg{width:13px;height:13px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px;
+    box-shadow:0 1px 1px rgba(47,44,55,.03),0 20px 40px -30px rgba(47,44,55,.2)}
+  .panel h2{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:22px;margin-bottom:14px}
+  .panel p{color:#4a4653;font-size:15px;margin-bottom:12px}
+  .panel p:last-child{margin-bottom:0}
+  .panel b{color:var(--ink);font-weight:600}
+  .list{list-style:none;margin:12px 0}
+  .list li{position:relative;padding-left:22px;margin-bottom:8px;color:#4a4653;font-size:15px}
+  .list li::before{content:"";position:absolute;left:2px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
 
-  .row{
-    display:flex;justify-content:center;gap:26px;margin-top:26px;flex-wrap:wrap;
-  }
-  .row .it{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);font-weight:500}
-  .row .it svg{width:15px;height:15px;color:var(--accent)}
+  .methods{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0 30px;flex-wrap:wrap}
+  .badge{font-size:11px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:7px;padding:6px 11px;background:#fff;
+    transition:transform .2s,border-color .2s}
+  .badge:hover{transform:translateY(-2px);border-color:var(--accent)}
 
-  .methods{
-    display:flex;align-items:center;justify-content:center;gap:8px;
-    margin-top:26px;flex-wrap:wrap;
-  }
-  .badge{
-    font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.02em;
-    border:1px solid var(--line);border-radius:7px;padding:5px 9px;background:#fff;
-  }
+  .req{background:var(--soft);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px}
+  .req h2{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:20px;margin-bottom:14px}
+  .req .grid{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;font-size:14.5px}
+  .req .k{color:var(--muted)}
+  .req .v{color:var(--ink);font-weight:500}
 
-  footer{margin-top:24px;text-align:center;color:var(--faint);font-size:11.5px;line-height:1.6}
-  footer a{color:var(--muted);text-decoration:none;font-weight:600}
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12.5px;line-height:1.8}
+  footer .links{margin-bottom:8px}
+  footer .links a{color:var(--muted);font-weight:600;margin:0 10px}
 
-  .reveal{opacity:0;transform:translateY(10px);transition:opacity .6s ease,transform .6s ease}
+  /* Появление при скролле */
+  .reveal{opacity:0;transform:translateY(24px) scale(.98);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
   .reveal.in{opacity:1;transform:none}
-  @media (prefers-reduced-motion:reduce){.pay,.reveal{transition:none}}
 
-  @media (max-width:480px){
-    body{padding:28px 18px}
-    .card{padding:30px 22px 26px}
-    .row{gap:16px}
+  @media (max-width:560px){
+    body{padding:26px 16px 40px}
+    .product{padding:20px}.panel{padding:22px 20px}.req{padding:20px}
+    .req .grid{grid-template-columns:1fr;gap:2px 0}.req .k{margin-top:8px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    .reveal{opacity:1;transform:none}
+    .amb,.glow{display:none}
   }
 </style>
 </head>
 <body>
+  <div class="progress" id="progress"></div>
+  <div class="amb" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+  <div class="glow" id="glow" aria-hidden="true"></div>
+
   <div class="wrap">
     <header class="reveal">
-      <div class="brand"><span class="dot">&#9889;</span> YourBrand</div>
+      <div class="brand"><span class="dot">&#9889;</span> Никитина А. А.</div>
       <div class="safe">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Защищённая оплата
       </div>
     </header>
 
-    <main class="card reveal">
-      <div class="label">Оплата</div>
-      <h1 id="title">Оформление заказа</h1>
-      <p class="lede" id="subtitle">Оплата картой, СБП или электронным кошельком. Проходит на защищённой странице Робокассы — данные карты вводятся не здесь.</p>
-
-      <div class="order">
-        <div>
-          <div class="order-name" id="itemName">Заказ</div>
-          <div class="order-sub" id="itemSub">Оплата в один шаг</div>
-        </div>
-        <div class="price"><span id="amountView">350</span> <small>&#8381;</small></div>
-      </div>
-
-      <button class="pay" onclick="pay()" id="payBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>
-        Перейти к оплате
-      </button>
-
-      <div class="trust">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-        Безопасное соединение
-      </div>
-    </main>
-
-    <div class="row reveal">
-      <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Без комиссии</div>
-      <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Зачисление сразу</div>
-      <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Чек на почту</div>
+    <div class="hero reveal">
+      <div class="label">Онлайн-обучение и гайды</div>
+      <h1>Обучение и цифровые продукты</h1>
+      <p>Курсы по бьюти-направлениям и практические гайды. Все материалы в электронном формате, доступ выдаётся после оплаты.</p>
     </div>
+
+    <section class="reveal">
+      <div class="sec-title">Услуги и цены</div>
+      <div class="products" id="products"></div>
+    </section>
 
     <div class="methods reveal">
       <span class="badge">Visa</span><span class="badge">Mastercard</span>
       <span class="badge">МИР</span><span class="badge">СБП</span>
     </div>
 
+    <section class="panel reveal">
+      <h2>Как проходит оплата и получение</h2>
+      <p>Все продукты и услуги предоставляются в <b>электронном формате</b>. После успешной оплаты покупатель получает:</p>
+      <ul class="list">
+        <li>доступ к обучению через личный кабинет, Telegram или другую образовательную платформу;</li>
+        <li>информацию о дате и времени начала обучения (если это потоковый курс).</li>
+      </ul>
+      <p><b>Срок предоставления доступа:</b></p>
+      <ul class="list">
+        <li>Гайды — автоматически или в течение 24 часов после оплаты.</li>
+        <li>Онлайн-обучение — в течение 24 часов после подтверждения оплаты, если иное не указано в описании курса.</li>
+        <li>Индивидуальное обучение — по согласованию сторон после оплаты.</li>
+      </ul>
+      <p>Физическая доставка товаров не осуществляется.</p>
+    </section>
+
+    <section class="panel reveal">
+      <h2>Возврат денежных средств</h2>
+      <p>После предоставления доступа к обучению, цифровым материалам или начала оказания услуги полный или частичный возврат денежных средств не предусмотрен.</p>
+      <p>Возврат возможен только в случае, если услуга не была оказана или сделка не состоялась по вине Исполнителя.</p>
+      <p>В случае принятия решения о возврате денежные средства перечисляются тем же способом, которым была произведена оплата, в течение <b>10 рабочих дней</b>.</p>
+    </section>
+
+    <section class="req reveal">
+      <h2>Реквизиты и контакты</h2>
+      <div class="grid">
+        <div class="k">Продавец</div><div class="v">Никитина Анастасия Александровна</div>
+        <div class="k">ИНН</div><div class="v">614089869503</div>
+        <div class="k">Статус</div><div class="v">Самозанятый / ИП</div>
+        <div class="k">E-mail</div><div class="v">[укажите почту для связи]</div>
+        <div class="k">Телефон</div><div class="v">[укажите телефон]</div>
+        <div class="k">Сайт</div><div class="v">nnring.ru</div>
+      </div>
+    </section>
+
     <footer class="reveal">
-      Нажимая «Перейти к оплате», вы соглашаетесь с офертой.<br>
-      Платежи через сервис <a href="https://robokassa.com" target="_blank" rel="noopener">Робокасса</a>.
+      <div class="links">
+        <a href="/oferta">Публичная оферта</a>
+        <a href="/privacy">Политика конфиденциальности</a>
+      </div>
+      Никитина Анастасия Александровна · ИНН 614089869503<br>
+      Оплата через сервис <a href="https://robokassa.com" target="_blank" rel="noopener">Робокасса</a>
     </footer>
   </div>
 
 <script>
+  /* ===================== НАСТРОЙКИ ===================== */
   const CONFIG = {
     merchantLogin: "ВАШ_ЛОГИН_МАГАЗИНА",
     password1:     "ВАШ_ПАРОЛЬ_1",
-    outSum:        "350.00",
-    description:   "Оплата заказа",
-    isTest:        1,
-    title:    "Оформление заказа",
-    subtitle: "Оплата картой, СБП или электронным кошельком. Проходит на защищённой странице Робокассы — данные карты вводятся не здесь.",
-    itemName: "Заказ",
-    itemSub:  "Оплата в один шаг"
+    isTest:        1
   };
+  const PRODUCTS = [
+    { name:"Обучение лазерной эпиляции", desc:"Онлайн-курс с доступом через личный кабинет", price:5000, from:true },
+    { name:"Обучение по отбеливанию кожи", desc:"Онлайн-курс, доступ после подтверждения оплаты", price:1500, from:true },
+    { name:"Гайды по продвижению рилс", desc:"Практические материалы, доступ сразу после оплаты", price:120, from:true }
+  ];
+  /* ==================================================== */
 
-  document.getElementById("amountView").textContent = String(CONFIG.outSum).replace(/\.00$/,"");
-  document.getElementById("title").textContent    = CONFIG.title;
-  document.getElementById("subtitle").textContent = CONFIG.subtitle;
-  document.getElementById("itemName").textContent = CONFIG.itemName;
-  document.getElementById("itemSub").textContent  = CONFIG.itemSub;
-  document.title = CONFIG.title;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  function pay(){
+  // Рендер карточек
+  var box=document.getElementById("products");
+  PRODUCTS.forEach(function(p){
+    var el=document.createElement("div");
+    el.className="product reveal";
+    el.innerHTML=
+      '<div class="info"><h3></h3><div class="d"></div></div>'+
+      '<div class="buy"><div class="price">'+
+        (p.from?'<span class="from">от</span>':'')+
+        '<span class="num" data-val="'+p.price+'">0</span> \u20BD</div>'+
+      '<button class="pay">Оплатить</button></div>';
+    el.querySelector("h3").textContent=p.name;
+    el.querySelector(".d").textContent=p.desc;
+    el.querySelector(".pay").addEventListener("click",function(e){ pay(e,this,p.price,p.name); });
+    box.appendChild(el);
+  });
+
+  // Оплата
+  function pay(e,btn,sum,description){
+    var rect=btn.getBoundingClientRect();
+    var r=document.createElement("span");r.className="ripple";
+    r.style.left=(e.clientX-rect.left)+"px";r.style.top=(e.clientY-rect.top)+"px";
+    r.style.width=r.style.height="18px";btn.appendChild(r);setTimeout(function(){r.remove();},600);
+
     if(CONFIG.merchantLogin.indexOf("ВАШ_")===0){
-      alert("Заполните merchantLogin и password1 в блоке CONFIG внутри index.html");
-      return;
+      alert("Заполните merchantLogin и password1 в блоке CONFIG внутри index.html");return;
     }
-    var invId=0;
-    var signature=md5(CONFIG.merchantLogin+":"+CONFIG.outSum+":"+invId+":"+CONFIG.password1);
+    btn.classList.add("loading");
+    var outSum=Number(sum).toFixed(2),invId=0;
+    var signature=md5(CONFIG.merchantLogin+":"+outSum+":"+invId+":"+CONFIG.password1);
     var params=new URLSearchParams({
-      MerchantLogin:CONFIG.merchantLogin, OutSum:CONFIG.outSum, InvId:invId,
-      Description:CONFIG.description, SignatureValue:signature, IsTest:CONFIG.isTest
+      MerchantLogin:CONFIG.merchantLogin,OutSum:outSum,InvId:invId,
+      Description:description,SignatureValue:signature,IsTest:CONFIG.isTest
     });
-    window.location.href="https://auth.robokassa.ru/Merchant/Index.aspx?"+params.toString();
+    setTimeout(function(){ window.location.href="https://auth.robokassa.ru/Merchant/Index.aspx?"+params.toString(); },500);
   }
 
-  window.addEventListener("load",function(){
-    document.querySelectorAll(".reveal").forEach(function(el,i){
-      setTimeout(function(){el.classList.add("in");}, 100*i);
+  // Появление при скролле + счётчик цен
+  function countUp(elm){
+    var target=+elm.dataset.val,dur=900,t0=null;
+    function step(ts){ if(!t0)t0=ts;var k=Math.min((ts-t0)/dur,1);
+      var e=1-Math.pow(1-k,3);
+      elm.textContent=Math.round(target*e).toLocaleString("ru-RU");
+      if(k<1)requestAnimationFrame(step);}
+    requestAnimationFrame(step);
+  }
+  if(reduce){
+    document.querySelectorAll(".reveal").forEach(function(el){el.classList.add("in");});
+    document.querySelectorAll(".num").forEach(function(n){n.textContent=(+n.dataset.val).toLocaleString("ru-RU");});
+  }else{
+    var io=new IntersectionObserver(function(items){
+      items.forEach(function(it){
+        if(it.isIntersecting){
+          it.target.classList.add("in");
+          it.target.querySelectorAll&&it.target.querySelectorAll(".num").forEach(countUp);
+          io.unobserve(it.target);
+        }
+      });
+    },{threshold:.15});
+    document.querySelectorAll(".reveal").forEach(function(el){io.observe(el);});
+  }
+
+  // 3D-наклон карточек за курсором
+  if(!reduce){
+    document.addEventListener("mousemove",function(e){
+      var t=e.target.closest(".product");
+      document.querySelectorAll(".product").forEach(function(c){
+        if(c!==t){c.style.transform="";return;}
+        var r=c.getBoundingClientRect();
+        var px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
+        c.style.setProperty("--mx",(px*100)+"%");
+        c.style.setProperty("--my",(py*100)+"%");
+        c.style.transform="perspective(900px) rotateX("+((.5-py)*5)+"deg) rotateY("+((px-.5)*6)+"deg)";
+      });
     });
-  });
+    document.addEventListener("mouseleave",function(){
+      document.querySelectorAll(".product").forEach(function(c){c.style.transform="";});
+    });
+  }
+
+  // Свечение за курсором
+  if(!reduce){
+    var glow=document.getElementById("glow"),gx=window.innerWidth/2,gy=window.innerHeight/2,cx=gx,cy=gy;
+    document.addEventListener("mousemove",function(e){gx=e.clientX;gy=e.clientY;glow.style.opacity="1";});
+    (function g(){cx+=(gx-cx)*.08;cy+=(gy-cy)*.08;glow.style.left=cx+"px";glow.style.top=cy+"px";requestAnimationFrame(g);})();
+  }
+
+  // Прогресс-бар скролла
+  var bar=document.getElementById("progress");
+  window.addEventListener("scroll",function(){
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.width=(h>0?(window.scrollY/h*100):0)+"%";
+  },{passive:true});
 </script>
 </body>
 </html>
